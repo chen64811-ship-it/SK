@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>仿真中餐候选谈话流程图 · 初次接触</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f5f3ee;
+    color: #2c2c2c;
+    padding: 40px 30px;
+    line-height: 1.6;
+  }
+  .container { max-width: 1280px; margin: 0 auto; }
+  
+  header {
+    text-align: center;
+    border-bottom: 3px solid #2c2c2c;
+    padding-bottom: 20px;
+    margin-bottom: 40px;
+  }
+  header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  header .subtitle {
+    font-size: 14px;
+    color: #666;
+    letter-spacing: 1px;
+  }
+  
+  /* 阶段大块 */
+  .phase {
+    background: white;
+    border: 2px solid #2c2c2c;
+    margin-bottom: 24px;
+    box-shadow: 4px 4px 0 #2c2c2c;
+  }
+  .phase-header {
+    background: #2c2c2c;
+    color: white;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .phase-num {
+    background: white;
+    color: #2c2c2c;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .phase-title {
+    flex: 1;
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .phase-meta {
+    font-size: 13px;
+    opacity: 0.8;
+  }
+  .phase-body {
+    padding: 24px;
+  }
+  
+  /* 阶段 0 校准 */
+  .calibration {
+    background: #fff8e1;
+    border: 2px dashed #c9a227;
+    padding: 20px;
+    margin-bottom: 24px;
+  }
+  .calibration h3 {
+    color: #8a6d00;
+    margin-bottom: 12px;
+    font-size: 16px;
+  }
+  .calibration-q {
+    background: white;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    border-left: 4px solid #c9a227;
+    font-size: 14px;
+  }
+  .calibration-q strong { color: #8a6d00; }
+  
+  /* 三层共通问题 */
+  .layer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .layer {
+    border: 1px solid #ccc;
+    padding: 16px;
+    background: #fafafa;
+  }
+  .layer-title {
+    font-weight: 700;
+    color: #2c2c2c;
+    border-bottom: 2px solid #2c2c2c;
+    padding-bottom: 6px;
+    margin-bottom: 12px;
+    font-size: 14px;
+  }
+  .layer-purpose {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 12px;
+    font-style: italic;
+  }
+  .question {
+    background: white;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    border-left: 3px solid #4a90a4;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .question .q-text { font-weight: 500; margin-bottom: 4px; color: #1a1a1a; }
+  .question .q-watch {
+    font-size: 11px;
+    color: #888;
+    border-top: 1px dashed #ccc;
+    padding-top: 4px;
+    margin-top: 4px;
+  }
+  .signal-warning { color: #c93838; font-weight: 600; }
+  
+  /* 差异化问题 */
+  .diff-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .candidate {
+    border: 2px solid #4a90a4;
+    background: #f0f7fa;
+    padding: 20px;
+  }
+  .candidate-header {
+    background: #4a90a4;
+    color: white;
+    margin: -20px -20px 16px -20px;
+    padding: 12px 20px;
+    font-weight: 600;
+    font-size: 15px;
+  }
+  .candidate-A .candidate-header { background: #c66b3d; }
+  .candidate-A { border-color: #c66b3d; background: #fdf3ec; }
+  
+  .core-hypothesis {
+    background: white;
+    border-left: 4px solid currentColor;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    font-size: 13px;
+  }
+  
+  .killer-q {
+    background: #2c2c2c;
+    color: white;
+    padding: 14px 16px;
+    margin-top: 12px;
+    border-radius: 4px;
+  }
+  .killer-q-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    opacity: 0.7;
+    margin-bottom: 6px;
+  }
+  .killer-q-text {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+  .killer-q-watch {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid #555;
+    font-size: 11px;
+    opacity: 0.8;
+    line-height: 1.5;
+  }
+  
+  /* 判断三元组 */
+  .judge-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .judge-card {
+    border: 1px solid #2c2c2c;
+    padding: 16px;
+    background: #fafafa;
+    position: relative;
+  }
+  .judge-num {
+    position: absolute;
+    top: -10px;
+    left: 16px;
+    background: #2c2c2c;
+    color: white;
+    padding: 2px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+  .judge-title {
+    font-weight: 700;
+    margin-top: 6px;
+    margin-bottom: 8px;
+    font-size: 15px;
+  }
+  .judge-options {
+    list-style: none;
+    font-size: 12px;
+  }
+  .judge-options li {
+    padding: 4px 0;
+    padding-left: 16px;
+    position: relative;
+  }
+  .judge-options li::before {
+    content: '□';
+    position: absolute;
+    left: 0;
+  }
+  
+  /* 归档表 */
+  .archive {
+    background: #f0f0f0;
+    border: 2px solid #2c2c2c;
+    padding: 20px;
+    font-family: "Courier New", monospace;
+    font-size: 13px;
+    line-height: 1.8;
+    white-space: pre-wrap;
+  }
+  
+  /* 决策路径 */
+  .decision-flow {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .decision-card {
+    padding: 14px;
+    text-align: center;
+    border: 2px solid #2c2c2c;
+    background: white;
+  }
+  .decision-card.go { border-color: #2d8c4a; background: #e8f5ec; }
+  .decision-card.maybe { border-color: #c9a227; background: #fff8e1; }
+  .decision-card.hold { border-color: #6b6b6b; background: #f0f0f0; }
+  .decision-card.stop { border-color: #c93838; background: #fde9e9; }
+  .decision-card .icon {
+    font-size: 24px;
+    margin-bottom: 6px;
+  }
+  .decision-card .label {
+    font-weight: 700;
+    margin-bottom: 4px;
+    font-size: 13px;
+  }
+  .decision-card .desc {
+    font-size: 11px;
+    color: #555;
+    line-height: 1.4;
+  }
+  
+  /* 时间轴 */
+  .timeline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 24px 0;
+    position: relative;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 5%;
+    right: 5%;
+    top: 50%;
+    height: 2px;
+    background: #2c2c2c;
+    z-index: 0;
+  }
+  .tl-node {
+    background: white;
+    border: 2px solid #2c2c2c;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    z-index: 1;
+    position: relative;
+  }
+  
+  /* 自答提示 */
+  .self-q {
+    background: #fff8e1;
+    border-left: 4px solid #c9a227;
+    padding: 14px 18px;
+    margin-bottom: 12px;
+    font-size: 13px;
+  }
+  .self-q-label {
+    font-weight: 700;
+    color: #8a6d00;
+    margin-bottom: 6px;
+    font-size: 12px;
+    letter-spacing: 1px;
+  }
+  
+  /* 注脚 */
+  footer {
+    text-align: center;
+    padding-top: 30px;
+    margin-top: 40px;
+    border-top: 1px solid #ccc;
+    color: #888;
+    font-size: 12px;
+  }
+  
+  /* 打印优化 */
+  @media print {
+    body { padding: 20px; background: white; }
+    .phase { page-break-inside: avoid; box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>仿真中餐候选 · 谈话流程图</h1>
+  <div class="subtitle">初次接触版 · v0.1 · 2026-05-05</div>
+</header>
+
+<!-- 时间轴 -->
+<div class="timeline">
+  <div class="tl-node">谈前校准</div>
+  <div class="tl-node">三层共通（30 分钟）</div>
+  <div class="tl-node">差异化问题（10 分钟）</div>
+  <div class="tl-node">现场观察</div>
+  <div class="tl-node">归档 24h</div>
+  <div class="tl-node">最终判断</div>
+</div>
+
+<!-- 阶段 0 -->
+<div class="phase">
+  <div class="phase-header">
+    <div class="phase-num">0</div>
+    <div class="phase-title">谈前校准 · 杨自答</div>
+    <div class="phase-meta">约谈话之前完成</div>
+  </div>
+  <div class="phase-body">
+    <div class="calibration">
+      <h3>必须先答的三个问题</h3>
+      <div class="calibration-q">
+        <strong>① 这次谈话的性质是？</strong><br>
+        □ 初次接触判断要不要继续合作（本流程图按这个写）<br>
+        □ 已判断要合作，谈具体合作模式（→ 本流程图不适用，需另写）
+      </div>
+      <div class="calibration-q">
+        <strong>② 她们已经知道多少了？</strong>（只听过我 / 看过公众号 / 已看过项目方案）
+      </div>
+      <div class="calibration-q">
+        <strong>③ 我这次最想拿到的一个判断是什么？</strong>（一句话——不是"看看是不是合适"，是具体的判断）
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 阶段 1 -->
+<div class="phase">
+  <div class="phase-header">
+    <div class="phase-num">1</div>
+    <div class="phase-title">谈话目的 · 30-45 分钟内必须回答的三个判断</div>
+    <div class="phase-meta">不要回答模糊的"她合不合适"</div>
+  </div>
+  <div class="phase-body">
+    <div class="judge-grid">
+      <div class="judge-card">
+        <div class="judge-num">判断 1</div>
+        <div class="judge-title">身份归类</div>
+        <ul class="judge-options">
+          <li>合伙人候选（押注十年）</li>
+          <li>资源伙伴（专业能力 / 渠道）</li>
+          <li>短期协作者（某阶段帮忙）</li>
+          <li>不合适（不进下一步）</li>
+        </ul>
+      </div>
+      <div class="judge-card">
+        <div class="judge-num">判断 2</div>
+        <div class="judge-title">来意三层</div>
+        <ul class="judge-options">
+          <li>表层：她说出口的</li>
+          <li>中层：处境推动的</li>
+          <li>深层：她未必意识到的</li>
+        </ul>
+      </div>
+      <div class="judge-card">
+        <div class="judge-num">判断 3</div>
+        <div class="judge-title">持续时间</div>
+        <ul class="judge-options">
+          <li>生活排序里第几位</li>
+          <li>3 / 6 / 12 月后还在不在</li>
+          <li>触发她退出的最小信号</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 阶段 2 共通问题 -->
+<div class="phase">
+  <div class="phase-header">
+    <div class="phase-num">2</div>
+    <div class="phase-title">三层共通问题（两位都问）</div>
+    <div class="phase-meta">约 30 分钟 · 每层 10 分钟</div>
+  </div>
+  <div class="phase-body">
+    <div class="layer-grid">
+      
+      <div class="layer">
+        <div class="layer-title">第一层 · 看历史</div>
+        <div class="layer-purpose">她说的和做过的对得上吗</div>
+        <div class="question">
+          <div class="q-text">你上一份工作做到第几个月开始觉得"这件事我能拿主意"？</div>
+          <div class="q-watch">看主动性 vs 执行性</div>
+        </div>
+        <div class="question">
+          <div class="q-text">你做过的事里，哪一件是没人推你、你自己干起来的？</div>
+          <div class="q-watch">看零到一能力。<span class="signal-warning">说不出来 = 好执行者，不是合伙人</span></div>
+        </div>
+        <div class="question">
+          <div class="q-text">你最近一次和合伙人/老板争执是为什么？最后怎么解决？</div>
+          <div class="q-watch">看冲突处理。<span class="signal-warning">说"没争执过" = 新人或不说真话</span></div>
+        </div>
+      </div>
+
+      <div class="layer">
+        <div class="layer-title">第二层 · 看现状</div>
+        <div class="layer-purpose">她现在卡在哪里</div>
+        <div class="question">
+          <div class="q-text">你现在每月收入大概什么水平，能撑多久不工作？</div>
+          <div class="q-watch"><span class="signal-warning">撑不了 3 个月 → 合伙人选项直接关闭</span>。她要的是一份工，不是一件事</div>
+        </div>
+        <div class="question">
+          <div class="q-text">如果这件事 6 个月没钱，你会继续还是退出？</div>
+          <div class="q-watch"><span class="signal-warning">回答"我相信一定能成" = 危险信号 A04</span>（护城河用未来时）</div>
+        </div>
+        <div class="question">
+          <div class="q-text">你最近 30 天最让你焦虑的事是什么？</div>
+          <div class="q-watch">不一定关于这个项目。是否说真话的最直接试金石</div>
+        </div>
+      </div>
+
+      <div class="layer">
+        <div class="layer-title">第三层 · 看共振</div>
+        <div class="layer-purpose">她是来找一份工还是一件事</div>
+        <div class="question">
+          <div class="q-text">你看过我的公众号哪几篇？哪一篇你不同意我说的？</div>
+          <div class="q-watch">同意太多=形式匹配。能说不同意=真在思考</div>
+        </div>
+        <div class="question">
+          <div class="q-text">如果今天这个项目要砍掉，你下一步去做什么？</div>
+          <div class="q-watch">"一起想新的"=合伙人 / "找下家"=打工 / "自己继续做"=资源伙伴</div>
+        </div>
+        <div class="question">
+          <div class="q-text">假设这件事 3 年后做成了，你的画面是什么？</div>
+          <div class="q-watch">"赚到X钱"=资源伙伴 / "独立做一摊"=合伙人 / "一起做出来"=都可能</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- 阶段 3 差异化问题 -->
+<div class="phase">
+  <div class="phase-header">
+    <div class="phase-num">3</div>
+    <div class="phase-title">差异化问题 · 验证她的核心价值假设</div>
+    <div class="phase-meta">每位约 10 分钟 · 末尾一道关键题</div>
+  </div>
+  <div class="phase-body">
+    <div class="diff-grid">
+
+      <div class="candidate candidate-A">
+        <div class="candidate-header">候选 A · 跨境电商背景</div>
+        <div class="core-hypothesis">
+          <strong>核心假设：</strong>能把"仿真中餐摆件"卖出去
+        </div>
+
+        <div class="question">
+          <div class="q-text">你做过的跨境电商，最高一个月 GMV / 退货率 / 毛利率？</div>
+          <div class="q-watch"><span class="signal-warning">说不出具体数字 = 没操盘过</span></div>
+        </div>
+        <div class="question">
+          <div class="q-text">你卖过最难卖的一个 SKU 是什么？怎么处理的？</div>
+          <div class="q-watch">"清仓亏损"=诚实；"找新渠道盘活"=能力</div>
+        </div>
+        <div class="question">
+          <div class="q-text">假设我们在亚马逊一个月卖 50 单，你判断是早期信号还是失败？</div>
+          <div class="q-watch">"50单太少"=见过大盘 / "看类目和投入"=有方法论 / "还可以"=没打过仗</div>
+        </div>
+        <div class="question">
+          <div class="q-text">中餐摆件 / 文化类 / 装饰类 / 餐饮周边类，你接触过吗？</div>
+          <div class="q-watch">完全陌生 → 资源伙伴价值打折</div>
+        </div>
+
+        <div class="killer-q">
+          <div class="killer-q-label">▼ 30 秒答不上的关键题 ▼</div>
+          <div class="killer-q-text">
+            "如果我们今天就做亚马逊，你需要什么资源才能在第 30 天产生第一笔销售？请精确到周次。"
+          </div>
+          <div class="killer-q-watch">
+            观察反应：<br>
+            • 反问"我需要更多信息" → 专业人员的本能（好信号）<br>
+            • 直接列 4 周计划 → 看真实可行性<br>
+            • "这个不好说" → 她在回避
+          </div>
+        </div>
+      </div>
+
+      <div class="candidate candidate-B">
+        <div class="candidate-header">候选 B · 拍摄+主播背景</div>
+        <div class="core-hypothesis">
+          <strong>核心假设：</strong>能为产品创造内容素材并自己出镜带货
+        </div>
+
+        <div class="question">
+          <div class="q-text">你做主播最高一场观众多少？销售额？</div>
+          <div class="q-watch">"还行" = 数据不好看 / 具体数字 = 真打过</div>
+        </div>
+        <div class="question">
+          <div class="q-text">你拍过最满意的一支视频是什么？为什么满意？</div>
+          <div class="q-watch">"播放量高"=流量思维 / "我自己也想买"=产品思维</div>
+        </div>
+        <div class="question">
+          <div class="q-text">让你今天给一盘"仿真鱼香肉丝"拍 60 秒视频，讲讲分镜。</div>
+          <div class="q-watch"><span class="signal-warning">现场展示——给不出具体分镜 = 可能只是出过镜没操过盘</span></div>
+        </div>
+        <div class="question">
+          <div class="q-text">你出过镜，但你愿意一直出镜吗？还是想退到幕后做导演？</div>
+          <div class="q-watch">3 年位置自我判断错配 → 后面合作必出问题</div>
+        </div>
+
+        <div class="killer-q">
+          <div class="killer-q-label">▼ 30 秒答不上的关键题 ▼</div>
+          <div class="killer-q-text">
+            "如果我们这个产品 6 个月内只能在一个平台做内容，你选小红书、抖音、还是 TikTok？为什么？"
+          </div>
+          <div class="killer-q-watch">
+            不要她报答案，要她讲选择逻辑：<br>
+            • 直接报平台名 → 路径依赖<br>
+            • 讲产品 + 人群 + 成本 → 有判断<br>
+            • "看情况" → 在回避
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- 阶段 4 归档 -->
+<div class="phase">
+  <div class="phase-header">
+    <div class="phase-num">4</div>
+    <div class="phase-title">谈完后归档 · 24 小时内</div>
+    <div class="phase-meta">每人一张 A4，不要拖</div>
+  </div>
+  <div class="phase-body">
+<div class="archive">姓名：
+谈话日期：
+谈话时长：
+我事先想拿到的判断：
+
+【三个判断输出】
+1. 身份归类：□ 合伙人候选 □ 资源伙伴 □ 短期协作 □ 不合适
+2. 来意三层：表层 / 中层 / 深层
+3. 持续时间预估 + 退出触发器
+
+【关键观察】
+- 她说的和做的对得上吗？最大反差是什么
+- 30 秒答不上的问题 + 她的实际反应
+- 她让我重新想了一遍的那个角度（她带给我的）
+- 我感觉到的最大违和（直觉）
+
+【风险识别】
+- 她身上最可能触发的 FM
+- 我在用什么"她应该没问题"的合理化（D-Q3）
+
+【下一步动作】
+□ 立即推进  □ 二次约谈  □ 维持联系  □ 关闭
+
+理由（一句话）：</div>
+  </div>
+</div>
+
+<!-- 阶段 5 决策 -->
+<div class="phase">
+  <div class="phase-header">
+    <div class="phase-num">5</div>
+    <div class="phase-title">最终决策 · 四种走向</div>
+    <div class="phase-meta">两位都谈完再做</div>
+  </div>
+  <div class="phase-body">
+    <div class="decision-flow">
+      <div class="decision-card go">
+        <div class="icon">▶</div>
+        <div class="label">立即推进</div>
+        <div class="desc">24 小时内回复，进入下一步合作模式谈话（另一份提纲）</div>
+      </div>
+      <div class="decision-card maybe">
+        <div class="icon">⟳</div>
+        <div class="label">二次约谈</div>
+        <div class="desc">带具体问题再聊一次，必须明确这次想拿到什么</div>
+      </div>
+      <div class="decision-card hold">
+        <div class="icon">⏸</div>
+        <div class="label">维持联系</div>
+        <div class="desc">不进入合作，保持信号通道</div>
+      </div>
+      <div class="decision-card stop">
+        <div class="icon">✕</div>
+        <div class="label">关闭</div>
+        <div class="desc">明确告知不合作，不留尾巴</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 24px;">
+      <div class="self-q">
+        <div class="self-q-label">谈完后必答 · 真问题 1</div>
+        如果只能选一个进入下一步，是谁？为什么？<br>
+        <strong>不允许"两个都选"，不允许"再观察"。</strong>
+      </div>
+      <div class="self-q">
+        <div class="self-q-label">谈完后必答 · 真问题 2</div>
+        如果两位都选，三人组合的角色分工写得出来吗？<br>
+        <strong>写不出来 = 没想清楚 = 至少一位不是真合伙人。</strong>
+      </div>
+      <div class="self-q">
+        <div class="self-q-label">谈完后必答 · 真问题 3</div>
+        她们当中有没有人，让我感觉"我变了"？<br>
+        <strong>我在她面前不自觉地把自己讲得比实际更好/更差/更一致 → 这是个信号。</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 阶段 6 沉淀 -->
+<div class="phase">
+  <div class="phase-header">
+    <div class="phase-num">6</div>
+    <div class="phase-title">沉淀回路 · SK 系统</div>
+    <div class="phase-meta">谈完之后的固定动作</div>
+  </div>
+  <div class="phase-body">
+    <ul style="list-style: none; font-size: 14px;">
+      <li style="padding: 8px 0; border-bottom: 1px dashed #ccc;">
+        <strong>① </strong>24 小时内填完两份归档表
+      </li>
+      <li style="padding: 8px 0; border-bottom: 1px dashed #ccc;">
+        <strong>② </strong>把"她让我重新想了一遍的那个角度"提取出来，写入 <code>ops/清单草稿-未验证教训.md</code>
+        <div style="font-size: 12px; color: #888; margin-top: 4px;">场景 F 是清单新条目最活跃的来源</div>
+      </li>
+      <li style="padding: 8px 0; border-bottom: 1px dashed #ccc;">
+        <strong>③ </strong>如两位都进入下一步 → 各自再约一次具体合作模式谈话（另一份提纲）
+      </li>
+      <li style="padding: 8px 0;">
+        <strong>④ </strong>如都不进入下一步 → 用 24 小时记录"为什么我没有合适的人"，这本身是重要信号
+      </li>
+    </ul>
+  </div>
+</div>
+
+<footer>
+  D:\sk\ops\谈话流程图-仿真中餐候选-初次接触.html · 配套 <code>ops/谈话提纲-仿真中餐候选-初次接触.md</code>（详细文字版）<br>
+  谈完后用实战修正升 v1.0
+</footer>
+
+</div>
+</body>
+</html>
